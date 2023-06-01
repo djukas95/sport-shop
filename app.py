@@ -58,7 +58,7 @@ def register():
         pswrd = sha256_crypt.hash(request.form.get('pswrd'))
         verify_pass = request.form.get('verifypswrd')
         #Ako je ispravna sifra unesena oba puta komituje se u bazu
-        if sha256_crypt.verify(request.form.get('verifypswrd'), pswrd) == True:
+        if sha256_crypt.verify(verify_pas, pswrd) == True:
             cur.execute('INSERT INTO users(firstname, lastname, username, email, password) VALUES (%s, %s, %s, %s, %s)', [FirstName, LastName, username, email, pswrd])
             mysql.connection.commit()
             cur.close()
