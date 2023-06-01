@@ -21,7 +21,7 @@ app.config['SECRET_KEY'] = 'PythonZadatak'
 bootstrap = Bootstrap(app)
 #
 
-#KONFIG MYSQLA
+#KONFIG MYSQLA (Potreban unos podataka Nemanjine baze)
 db = yaml.load(open('db.yaml'))
 app.config['MYSQL_HOST'] = db['mysql_host']
 app.config['MYSQL_USER'] = db['mysql_user']
