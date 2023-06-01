@@ -39,6 +39,9 @@ def register():
     form = RegisterForm()
     if request.method == 'POST':
         cur = MySQL.connection.cursor()
+        FirstName = request.form.get('name')
+        LastName = request.form.get('surname')
+        email = request.form.get('email')
 
 
 
