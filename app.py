@@ -1,5 +1,5 @@
 #Importovanje Flaska, MYSQL-a i heša--------------------
-from flask import Flask, session, render_template, url_for, request, flash
+from flask import Flask, session, render_template, url_for, request, flash, redirect
 from flask_mysqldb import MySQL
 import yaml
 from passlib.hash import sha256_crypt
@@ -50,21 +50,30 @@ class LoginForm(FlaskForm):
 def register():
     form = RegisterForm()
     if request.method == 'POST':
-        cur = MySQL.connection.cursor()
-        FirstName = request.form.get('name')
-        LastName = request.form.get('surname')
+        cur = mysql.connection.cursor()
+        FirstName = request.form.get('FirstName')
+        LastName = request.form.get('LastName')
         email = request.form.get('email')
         username = request.form.get('username')
         pswrd = sha256_crypt.hash(request.form.get('pswrd'))
         verify_pass = request.form.get('verifypswrd')
+        #Provjerava da li u bazi podataka već postoji unesena email adresa
+        if (cur.execute('SELECT * FROM users WHERE email = %s', [email])):
+            flash('Email adresa vec postoji u bazi podataka, pokušajte da se prijavite', 'danger')
+            return render_template('register.html', form=form)
+        #Ako nema adresa već u bazi vrši se provjera šifre, šifra mora da sadrži preko 8 karaktera
+        if len(request.form.get('pswrd')) <= 7:
+            flash('Lozinka mora da sadrži bar 8 karaktera', 'danger')
+            return render_template('register.html', form=form)
         #Ako je ispravna sifra unesena oba puta komituje se u bazu
-        if sha256_crypt.verify(verify_pas, pswrd) == True:
+        if sha256_crypt.verify(verify_pass, pswrd) == True:
             cur.execute('INSERT INTO users(firstname, lastname, username, email, password) VALUES (%s, %s, %s, %s, %s)', [FirstName, LastName, username, email, pswrd])
             mysql.connection.commit()
             cur.close()
+            return redirect('/login/')
         else:
-            flash('Lozinke se ne podudaraju, pokušajte ponovo.')
+            flash('Lozinke se ne podudaraju, pokušajte ponovo.', 'danger')
             return render_template('register.html', form=form)
-            
-            
     return render_template('register.html', form=form)
+
+
