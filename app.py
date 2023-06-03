@@ -12,7 +12,7 @@ from flask_bootstrap import Bootstrap
 #Importovanje WTF Formi--------------------
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 #-------------------------------------------
 
 #Konfigurisanje Flaska i Bootstrapa
@@ -36,14 +36,14 @@ class RegisterForm(FlaskForm):
     LastName = StringField('Unesite Vase prezime', validators=[DataRequired()])
     email = StringField('Unesite Vasu email adresu', validators=[DataRequired()])
     username = StringField('Unesite željeno korisničko ime', validators=[DataRequired()])
-    pswrd = PasswordField('Unesite željenu lozinku', validators=[DataRequired()])
-    verifypswrd = PasswordField('Ponovo unesite lozinku', validators=[DataRequired()])
+    pswrd = PasswordField('Unesite željenu lozinku', validators=[DataRequired(), Length(min=8)])
+    verifypswrd = PasswordField('Ponovo unesite lozinku', validators=[DataRequired(), Length(min=8)])
     submit = SubmitField('Registracija', validators=[DataRequired()])
 
 
 class LoginForm(FlaskForm):
     username = StringField('Unesite korisničko ime', validators=[DataRequired()])
-    pswrd = PasswordField('Unesite lozinku', validators=[DataRequired()])
+    pswrd = PasswordField('Unesite lozinku', validators=[DataRequired(), Length(min=8)])
     submit = SubmitField('Log In', validators=[DataRequired()])
 
 @app.route('/register/', methods=['GET', 'POST'])
@@ -55,15 +55,11 @@ def register():
         LastName = request.form.get('LastName')
         email = request.form.get('email')
         username = request.form.get('username')
-        pswrd = sha256_crypt.hash(request.form.get('pswrd'))
+        pswrd = sha256_crypt.hash(request.form.get('pswrd'))#Vrši se heširanje lozinke
         verify_pass = request.form.get('verifypswrd')
         #Provjerava da li u bazi podataka već postoji unesena email adresa
         if (cur.execute('SELECT * FROM users WHERE email = %s', [email])):
             flash('Email adresa vec postoji u bazi podataka, pokušajte da se prijavite', 'danger')
-            return render_template('register.html', form=form)
-        #Ako nema adresa već u bazi vrši se provjera šifre, šifra mora da sadrži preko 8 karaktera
-        if len(request.form.get('pswrd')) <= 7:
-            flash('Lozinka mora da sadrži bar 8 karaktera', 'danger')
             return render_template('register.html', form=form)
         #Ako je ispravna sifra unesena oba puta komituje se u bazu
         if sha256_crypt.verify(verify_pass, pswrd) == True:
