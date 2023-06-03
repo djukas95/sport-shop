@@ -32,7 +32,7 @@ mysql = MySQL(app)
 
 
 class RegisterForm(FlaskForm):
-    FirstNme = StringField('Unesite Vase ime', validators=[DataRequired()])
+    FirstName = StringField('Unesite Vase ime', validators=[DataRequired()])
     LastName = StringField('Unesite Vase prezime', validators=[DataRequired()])
     email = StringField('Unesite Vasu email adresu', validators=[DataRequired()])
     username = StringField('Unesite željeno korisničko ime', validators=[DataRequired()])
