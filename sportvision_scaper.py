@@ -39,11 +39,19 @@ while current_page < number_pages:
             name = link.findAll('div', {'class': 'title'})
             price = link.findAll('div', {'class': 'current-price price-with-discount'})
             image = 'https://www.sportvision.ba' + link.find('img')['src']
+            ocjene = link.findAll('div', {'class': 'item-rate-wrapper-stars'})
             if price:
                 print(name[0].text.strip(), image, price[0].text.replace(" ", ""))
-                cursor.execute("INSERT INTO articles(article,price,photo,shops_id) VALUES (%s,%s,%s,%s)",
-                               [name[0].text.strip(), price[0].text.replace(" ", ""), image, id_shop])
-                mydb.commit()
+                if ocjene[0].find_all('div'):
+                    sirina = ocjene[0].find_all('div')[0].find_all('div')[2].get('style')
+                    ocjena = float(sirina[7:-1]) * 0.05
+                    cursor.execute("INSERT INTO articles(article,price,photo,shops_id,review) VALUES (%s,%s,%s,%s,%s)",
+                                   [name[0].text.strip(), price[0].text.replace(" ", ""), image, id_shop, ocjena])
+                    mydb.commit()
+                else:
+                    cursor.execute("INSERT INTO articles(article,price,photo,shops_id,review) VALUES (%s,%s,%s,%s,%s)",
+                                   [name[0].text.strip(), price[0].text.replace(" ", ""), image, id_shop, 0.0])
+                    mydb.commit()
         current_page += 1
     except Exception as e:
         print(e)
