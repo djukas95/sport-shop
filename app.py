@@ -55,21 +55,22 @@ def register():
         LastName = request.form.get('LastName')
         email = request.form.get('email')
         username = request.form.get('username')
-        pswrd = sha256_crypt.hash(request.form.get('pswrd'))#Vrši se heširanje lozinke
+        pswrd = request.form.get('pswrd')
         verify_pass = request.form.get('verifypswrd')
-        #Provjerava da li u bazi podataka već postoji unesena email adresa
-        if (cur.execute('SELECT * FROM users WHERE email = %s', [email])):
-            flash('Email adresa vec postoji u bazi podataka, pokušajte da se prijavite', 'danger')
-            return render_template('register.html', form=form)
-        #Ako je ispravna sifra unesena oba puta komituje se u bazu
-        if sha256_crypt.verify(verify_pass, pswrd) == True:
-            cur.execute('INSERT INTO users(firstname, lastname, username, email, password) VALUES (%s, %s, %s, %s, %s)', [FirstName, LastName, username, email, pswrd])
-            mysql.connection.commit()
-            cur.close()
-            return redirect('/login/')
+        #Provjerava da li se šifre podudaraju
+        if pswrd==verify_pass:
+            #Provjerava postoji li email u bazi podataka, ako nema komituje
+            if (cur.execute('SELECT * FROM users WHERE email = %s', [email]) ==0):
+                cur.execute('INSERT INTO users(firstname, lastname, username, email, password) VALUES (%s, %s, %s, %s, %s)', [FirstName, LastName, username, email, sha256_crypt.hash(pswrd)])
+                mysql.connection.commit()
+                cur.close()
+                flash('Registration successful! Please login.', 'success')
+                return redirect('/')
+            else:
+                flash('Email exists', 'danger')
+                return render_template('register.html', form=form)
         else:
-            flash('Lozinke se ne podudaraju, pokušajte ponovo.', 'danger')
+            flash('Password error', 'danger')
             return render_template('register.html', form=form)
     return render_template('register.html', form=form)
-
 
