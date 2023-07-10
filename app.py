@@ -74,3 +74,51 @@ def register():
             return render_template('register.html', form=form)
     return render_template('register.html', form=form)
 
+
+
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if request.method == 'POST':
+        if session.get('username') is None:
+            cur = mysql.connection.cursor()
+            username = request.form.get('username')
+            pswrd = request.form.get('password')#Lenght is set to minimum 8 characters
+            if (cur.execute('SELECT * FROM users WHERE username = %s', [username])) != 0:
+                try:
+                    cur.execute('SELECT password FROM users where username=%s', [username])
+                    password = cur.fetchone()
+                    if sha256_crypt.verify(pswrd , *password) == True:
+                        session['login'] = True
+                        session['username'] = request.form.get('username')
+                        cur.execute('SELECT * FROM users WHERE username = %s', [username])
+                        data = cur.fetchall()
+                        session['FirstName'] = data[0]
+                        session['LastName'] = data[1]
+                        session['Username'] = data[2]
+                        return redirect('/')
+                    else:
+                        flash('Password error', 'danger')
+                        return render_template('login.html', form=form)
+                except Exception as e:
+                    flash(e)
+                    return render_template('login.html', form=form)
+            else:
+                flash('Username not found.', 'danger')
+                return render_template('login.html', form=form)
+    return render_template('login.html', form=form)
+            
+        
+
+@app.route('/logout/', methods=['GET', 'POST'])
+def logout():
+    if session['login'] == True:
+        session.pop('Username', default=None)
+        session.pop('FirstName', default=None)
+        session.pop('LastName', default=None)
+        session.pop('login',  default=False)
+        #flash('Logged out!', 'success')
+        return redirect('/')
+    else:
+        flash('No one is logged in', 'info')
+        return render_template('index.html')
