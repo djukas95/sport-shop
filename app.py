@@ -92,7 +92,7 @@ def login():
                         session['login'] = True
                         session['username'] = request.form.get('username')
                         cur.execute('SELECT * FROM users WHERE username = %s', [username])
-                        data = cur.fetchall()
+                        data = cur.fetchone()
                         session['FirstName'] = data[0]
                         session['LastName'] = data[1]
                         session['Username'] = data[2]
