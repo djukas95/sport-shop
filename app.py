@@ -10,3 +10,8 @@ app.config['SECRET_KEY'] = 'Ratkos00!!'
 @app.route('/about/', methods= ['GET', 'POST'])
 def about():
     return render_template('about.html')
+
+@app.route('/contact/', methods= ['GET', 'POST'])
+def contact():
+    #Dio za podesavanje slanja mejla na dugme
+    return render_template('contact.html')

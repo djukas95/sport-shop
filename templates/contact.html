@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% import "Bootstrap/wtf.html" as wtf %}
+
+{% block title %} Contact Us {% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='/css/contact.css') }}">
+{% endblock %}
+
+{% block content %}
+<input type="checkbox" name="showForm" id="showForm" class="showForm">
+
+<div class="form">
+  <h2>Contact Us</h2>
+  <form>
+    <div class="left section">
+      <input type="text" name="name" placeholder="Your name" required>
+      <input type="email" name="email" placeholder="Your email" required>
+      <input type="tel" name="tel" placeholder="Your telephone number(Optional)">
+    </div>
+    <div class="right section">
+      <textarea name="comment" placeholder="Your comment" required></textarea>
+    </div>
+    <button type="submit" class="sendForm left">Send</button>
+    <label for="showForm" class="closeFormLabel left">Cancel</label>
+  </form>
+</div>
+
+<h1>Sport Shop</h1>
+
+<p>Feel free to talk with us.</p> 
+
+<label for="showForm" class="showFormLabel">Contact</label>
+{% endblock %}
