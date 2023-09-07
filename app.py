@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, session, flash
 
 #BOOTSTRAP i APP FLASK
 from flask_bootstrap import Bootstrap
@@ -13,5 +13,9 @@ def about():
 
 @app.route('/contact/', methods= ['GET', 'POST'])
 def contact():
-    #Dio za podesavanje slanja mejla na dugme
+    if request.method == 'POST':
+        if session.get('username') != True:
+            flash('No user detected, please consider registering', 'info')
+        else:
+            return render_template('contact.html')
     return render_template('contact.html')
