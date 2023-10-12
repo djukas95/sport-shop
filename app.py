@@ -7,10 +7,13 @@ bootstrap = Bootstrap(app)
 app.config['SECRET_KEY'] = 'Ratkos00!!'
 #-------------------------------
 
+#Ruta za About stranicu
 @app.route('/about/', methods= ['GET', 'POST'])
 def about():
     return render_template('about.html')
 
+
+#Ruta za Contact stranicu
 @app.route('/contact/', methods= ['GET', 'POST'])
 def contact():
     if request.method == 'POST':
